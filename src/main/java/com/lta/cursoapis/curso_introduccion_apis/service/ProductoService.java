@@ -17,6 +17,7 @@ public interface ProductoService {
     Optional<Producto> buscarPorId(Long idProducto);
 
     Producto actualizarProducto(Long idProducto, Producto producto) throws Exception;
+
     void eliminarProducto(Long idProducto) throws Exception;
 
     Producto cambiarEstadoProducto(Long idProducto, EstadoProducto estadoProducto) throws Exception;
