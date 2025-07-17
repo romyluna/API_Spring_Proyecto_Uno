@@ -31,4 +31,10 @@ public class Producto {
     @Enumerated(EnumType.STRING) //quiero guardar el enum en la base como un string
     @Column(name = "estado_producto",nullable = false)
     private EstadoProducto estadoProducto; //ENUM
+
+    //relacion con la tabla categoria
+    @ManyToOne
+    @JoinColumn(name="id_categoria",referencedColumnName = "id_categoria")
+    private Categoria categoria;
+
 }
