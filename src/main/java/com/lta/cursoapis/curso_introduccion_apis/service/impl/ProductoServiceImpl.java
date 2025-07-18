@@ -1,7 +1,9 @@
 package com.lta.cursoapis.curso_introduccion_apis.service.impl;
 
+import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
+import com.lta.cursoapis.curso_introduccion_apis.repository.CategoriaRepository;
 import com.lta.cursoapis.curso_introduccion_apis.repository.ProductoRepository;
 import com.lta.cursoapis.curso_introduccion_apis.service.ProductoService;
 import lombok.SneakyThrows;
@@ -18,13 +20,23 @@ import java.util.Optional;
 public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
-     private ProductoRepository productoRepository; //inyecto de repository
+     private ProductoRepository productoRepository; //inyecto de repository producto
+    @Autowired
+    private CategoriaRepository categoriaRepository; //inyecto de repository categoria
 
     @Override
-    public Producto registrarProducto(Producto producto) {
+    public Producto registrarProducto(Long idCategoria,Producto producto) throws Exception {
         //Producto nuevoProducto = productoRepository.save(producto);
         //return nuevoProducto;
-        return productoRepository.save(producto);
+        //return productoRepository.save(producto);
+
+        //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
+        Categoria categoria = categoriaRepository.findById(idCategoria)
+            .orElseThrow(() -> new Exception("Categoria con ID" + idCategoria + "no encontrada"));
+        //si existe la categoria que pasaron
+         producto.setCategoria(categoria);
+         return productoRepository.save(producto);
+
     }
 
     @Override
@@ -65,6 +77,25 @@ public class ProductoServiceImpl implements ProductoService {
 
         //Producto productoActualizado = productoRepository.save(productoExistente);
         //return productoActualizado;
+
+        // verifico si el producto que me pasaron
+        // ya viene con una categoría cargada, y si es así, confirma que esa categoría realmente exista en la base de datos
+        //IMPORTANTE :producto.getCategoria().getIdCategoria() PORQUE Primero accedo al objeto categoria que está dentro
+        // del producto, y después accedo al idCategoria que está dentro de ese objeto categoria.
+        if(producto.getCategoria() != null && producto.getCategoria().getIdCategoria() !=null){
+            //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
+            Categoria categoria = categoriaRepository.findById(producto.getCategoria().getIdCategoria())
+                    .orElseThrow(() -> new Exception("Categoria no encontrada"));
+            //si existe:
+
+            System.out.println("ID de la categoría recibida: " + producto.getCategoria().getIdCategoria());
+            System.out.println("Asignando categoría: " + categoria.getNombreCategoria());
+
+
+            productoExistente.setCategoria(categoria);
+        }
+
+        System.out.println("Producto final antes de guardar: " + productoExistente);
 
         return productoRepository.save(productoExistente); // directamente
     }

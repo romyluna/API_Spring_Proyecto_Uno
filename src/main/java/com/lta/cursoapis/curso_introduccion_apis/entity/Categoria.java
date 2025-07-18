@@ -1,5 +1,6 @@
 package com.lta.cursoapis.curso_introduccion_apis.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class Categoria {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id_categoria")
     private Long idCategoria;
+
 
     @Column(name = "nombre_categoria",nullable = false,length = 50)
     private String nombreCategoria;

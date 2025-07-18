@@ -1,5 +1,6 @@
 package com.lta.cursoapis.curso_introduccion_apis.Controller;
 
+import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
 import com.lta.cursoapis.curso_introduccion_apis.service.ProductoService;
@@ -20,9 +21,11 @@ public class ProductoController {
 
     @PostMapping("/registrar")
     //ResonseEntity:Se usa cuando no se o no me el tipo exacto del dato que va a devolver el ResponseEntity.
-    public ResponseEntity<?> registrarProducto(@RequestBody Producto producto){
+    public ResponseEntity<?> registrarProducto(@RequestBody Producto producto) throws Exception{
         //guardo la respuesta en nuevoProducto
-        Producto nuevoProducto = productoService.registrarProducto(producto);
+
+        Long idCategoria = producto.getCategoria().getIdCategoria();
+        Producto nuevoProducto = productoService.registrarProducto(idCategoria,producto);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
     }
 
@@ -60,6 +63,9 @@ public class ProductoController {
             productoActualizado.setPrecio(producto.getPrecio());
             productoActualizado.setCantidad(producto.getCantidad());
             productoActualizado.setEstadoProducto(producto.getEstadoProducto());
+
+            productoActualizado.setCategoria(producto.getCategoria());
+
 
             Producto productoBBDD = productoService.actualizarProducto(idProducto,productoActualizado);
             return ResponseEntity.ok(productoActualizado);
