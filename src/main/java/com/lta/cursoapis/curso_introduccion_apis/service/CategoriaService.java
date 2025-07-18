@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface CategoriaService {
 
-    Categoria crearCategoria(Categoria categoria) throws BadRequestException;
+    Categoria crearCategoria(Categoria categoria) /*throws BadRequestException*/;
 
     List<Categoria> listarCategoria ();
 
     Optional<Categoria> categoriaPorId(Long idCategoria);
 
-    Categoria actualizarCategoria(Long idCategoria, Categoria categoria) throws Exception;
+    Categoria actualizarCategoria(Long idCategoria, Categoria categoria) /*throws Exception*/;
 
-    void eliminarCategoria(Long idCategoria) throws Exception;
+    void eliminarCategoria(Long idCategoria) /*throws Exception*/;
 }

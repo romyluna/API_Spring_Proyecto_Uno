@@ -3,6 +3,7 @@ package com.lta.cursoapis.curso_introduccion_apis.service.impl;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
+import com.lta.cursoapis.curso_introduccion_apis.exceptions.ResourceNotFoundException;
 import com.lta.cursoapis.curso_introduccion_apis.repository.CategoriaRepository;
 import com.lta.cursoapis.curso_introduccion_apis.repository.ProductoRepository;
 import com.lta.cursoapis.curso_introduccion_apis.service.ProductoService;
@@ -25,14 +26,15 @@ public class ProductoServiceImpl implements ProductoService {
     private CategoriaRepository categoriaRepository; //inyecto de repository categoria
 
     @Override
-    public Producto registrarProducto(Long idCategoria,Producto producto) throws Exception {
+    public Producto registrarProducto(Long idCategoria,Producto producto) /*throws Exception*/ {
         //Producto nuevoProducto = productoRepository.save(producto);
         //return nuevoProducto;
         //return productoRepository.save(producto);
 
         //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
         Categoria categoria = categoriaRepository.findById(idCategoria)
-            .orElseThrow(() -> new Exception("Categoria con ID" + idCategoria + "no encontrada"));
+            //.orElseThrow(() -> new Exception("Categoria con ID" + idCategoria + "no encontrada"));
+            .orElseThrow(() -> new ResourceNotFoundException("Categoria con ID" + idCategoria + "no encontrada"));
         //si existe la categoria que pasaron
          producto.setCategoria(categoria);
          return productoRepository.save(producto);
@@ -63,11 +65,12 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     // @SneakyThrows no me anda //es de lombok es como decir throw exception - no vas a colocar un try catch por eso usa este sneaky.
-    public Producto actualizarProducto(Long idProducto, Producto producto) throws Exception {
+    public Producto actualizarProducto(Long idProducto, Producto producto) /*throws Exception*/ {
         //chequeo que existe el id
         Producto productoExistente = productoRepository.findByIdProducto(idProducto)
                 //sino existe :
-                .orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                //.orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
         //si existe:
         productoExistente.setNombreProducto(producto.getNombreProducto());
         productoExistente.setDescripcion(producto.getDescripcion());
@@ -85,7 +88,8 @@ public class ProductoServiceImpl implements ProductoService {
         if(producto.getCategoria() != null && producto.getCategoria().getIdCategoria() !=null){
             //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
             Categoria categoria = categoriaRepository.findById(producto.getCategoria().getIdCategoria())
-                    .orElseThrow(() -> new Exception("Categoria no encontrada"));
+                    //.orElseThrow(() -> new Exception("Categoria no encontrada"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria no encontrada"));
             //si existe:
 
             System.out.println("ID de la categoría recibida: " + producto.getCategoria().getIdCategoria());
@@ -101,21 +105,23 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public void eliminarProducto(Long idProducto) throws Exception {
+    public void eliminarProducto(Long idProducto) /*throws Exception*/ {
         //chequeo que existe el id
          productoRepository.findByIdProducto(idProducto)
                  //sino existe :
-                .orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                //.orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                 .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
         //si existe:
          productoRepository.deleteById(idProducto); //no va con return porque no me devuelve nada
     }
 
     @Override
-    public Producto cambiarEstadoProducto(Long idProducto, EstadoProducto nuevoEstadoProducto) throws Exception {
+    public Producto cambiarEstadoProducto(Long idProducto, EstadoProducto nuevoEstadoProducto) /*throws Exception*/ {
         //chequeo que existe el id
             Producto productoExistente = productoRepository.findByIdProducto(idProducto)
                     //sino existe :
-                    .orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                    //.orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
         //si existe:
         productoExistente.setEstadoProducto(nuevoEstadoProducto); // no usa get porque es de un enum ya definido.
         //lo guarda

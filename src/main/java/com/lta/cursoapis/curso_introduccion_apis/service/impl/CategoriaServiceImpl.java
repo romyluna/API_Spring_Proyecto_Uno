@@ -1,9 +1,10 @@
 package com.lta.cursoapis.curso_introduccion_apis.service.impl;
 
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
+import com.lta.cursoapis.curso_introduccion_apis.exceptions.BadRequestException;
+import com.lta.cursoapis.curso_introduccion_apis.exceptions.ResourceNotFoundException;
 import com.lta.cursoapis.curso_introduccion_apis.repository.CategoriaRepository;
 import com.lta.cursoapis.curso_introduccion_apis.service.CategoriaService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     private CategoriaRepository categoriaRepository;
 
     @Override
-    public Categoria crearCategoria(Categoria categoria) throws BadRequestException {
+    public Categoria crearCategoria(Categoria categoria) /*throws BadRequestException*/ {
         if(categoriaRepository.existsByNombreCategoria(categoria.getNombreCategoria())){
             throw new BadRequestException("Ya existe una categoria con ese nombre");
         }
@@ -35,21 +36,23 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public Categoria actualizarCategoria(Long idCategoria, Categoria categoria) throws Exception {
+    public Categoria actualizarCategoria(Long idCategoria, Categoria categoria) /*throws Exception*/ {
         Categoria categoriaExistente = categoriaRepository.findById(idCategoria)
         //sino existe :
-                .orElseThrow(() -> new Exception("Producto con ID: " + idCategoria + " no encontrado"));
+                //.orElseThrow(() -> new Exception("Producto con ID: " + idCategoria + " no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idCategoria + " no encontrado"));
         //si existe:
         categoriaExistente.setNombreCategoria(categoria.getNombreCategoria());
         return categoriaRepository.save(categoriaExistente);
    }
 
     @Override
-    public void eliminarCategoria(Long idCategoria) throws Exception{
+    public void eliminarCategoria(Long idCategoria) /*throws Exception*/{
         //chequeo que existe el id
         categoriaRepository.findById(idCategoria)
                 //sino existe :
-                .orElseThrow(() -> new Exception("Producto con ID: " + idCategoria + " no encontrado"));
+                //.orElseThrow(() -> new Exception("Producto con ID: " + idCategoria + " no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idCategoria + " no encontrado"));
         //si existe:
         categoriaRepository.deleteById(idCategoria);
     }

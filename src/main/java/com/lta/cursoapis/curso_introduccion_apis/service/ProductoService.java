@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ProductoService {
 
-    Producto registrarProducto(Long idCategoria,Producto producto) throws Exception;
+    Producto registrarProducto(Long idCategoria,Producto producto) /*throws Exception*/;
 
     List<Producto> listarProductos();
 
@@ -16,11 +16,11 @@ public interface ProductoService {
 
     Optional<Producto> buscarPorId(Long idProducto);
 
-    Producto actualizarProducto(Long idProducto, Producto producto) throws Exception;
+    Producto actualizarProducto(Long idProducto, Producto producto) /*throws Exception*/;
 
-    void eliminarProducto(Long idProducto) throws Exception;
+    void eliminarProducto(Long idProducto) /*throws Exception*/;
 
-    Producto cambiarEstadoProducto(Long idProducto, EstadoProducto estadoProducto) throws Exception;
+    Producto cambiarEstadoProducto(Long idProducto, EstadoProducto estadoProducto) /*throws Exception*/;
 
     //si quiero obtener todos los productos del estado disponible
 
