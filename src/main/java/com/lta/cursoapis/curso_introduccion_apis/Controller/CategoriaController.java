@@ -2,6 +2,7 @@ package com.lta.cursoapis.curso_introduccion_apis.Controller;
 
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
+import com.lta.cursoapis.curso_introduccion_apis.exceptions.ResourceNotFoundException;
 import com.lta.cursoapis.curso_introduccion_apis.service.CategoriaService;
 import org.apache.coyote.BadRequestException;
 import org.apache.coyote.Response;
@@ -18,7 +19,6 @@ import java.util.Optional;
 public class CategoriaController {
 
     @Autowired
-
     private CategoriaService categoriaService;
 
     @PostMapping("/crear")
@@ -46,26 +46,34 @@ public class CategoriaController {
     @PutMapping("/actualizar/{idCategoria}")
     public ResponseEntity<?> actualizarCategoria(@PathVariable Long idCategoria,@RequestBody Categoria categoria){
         try{
-            Categoria categoriaActualizada = new Categoria();
-            categoriaActualizada.setIdCategoria(idCategoria);
-            categoriaActualizada.setNombreCategoria(categoria.getNombreCategoria());
-
-            Categoria productoBBDD = categoriaService.actualizarCategoria(idCategoria,categoriaActualizada);
-            return ResponseEntity.ok(categoriaActualizada);
-
-        }catch(Exception exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+            Categoria categoriaActualizada = categoriaService.actualizarCategoria(idCategoria, categoria);
+            if(categoriaActualizada != null){
+                return new ResponseEntity<>(categoriaActualizada,HttpStatus.OK);
+            }else {
+                throw new ResourceNotFoundException("categoria no encontrada para actualizar");
+                  }
+         }catch(Exception exception) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
     }
 
     @DeleteMapping("/{idCategoria}")
     public ResponseEntity<?> eliminarCategoria(@PathVariable Long idCategoria){
+
+        categoriaService.eliminarCategoria(idCategoria);
+        //return ResponseEntity.noContent().build(); //ok se elimino va sin cuerpo de mensaje se usa para eliminar
+        return ResponseEntity.ok("Categoría eliminada correctamente");
+     /*
         try{
             categoriaService.eliminarCategoria(idCategoria);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return new ResponseEntity<>(HttpStatus.OK);
         }catch(Exception exception){
+            //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         }
+     */
+
     }
 
 }

@@ -47,7 +47,7 @@ public class CategoriaServiceImpl implements CategoriaService {
    }
 
     @Override
-    public void eliminarCategoria(Long idCategoria) /*throws Exception*/{
+    public void eliminarCategoria(Long idCategoria){
         //chequeo que existe el id
         categoriaRepository.findById(idCategoria)
                 //sino existe :

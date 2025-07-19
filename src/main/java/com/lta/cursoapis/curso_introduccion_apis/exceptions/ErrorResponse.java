@@ -19,6 +19,7 @@ public class ErrorResponse {
     public ErrorResponse(String message, int statusCode, String errorDetails) {
         this.message = message;
         this.statusCode = statusCode;
+        this.timeStamp = LocalDateTime.now();
         this.errorDetails = errorDetails;
     }
 }

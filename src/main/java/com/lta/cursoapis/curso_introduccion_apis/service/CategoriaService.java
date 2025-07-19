@@ -17,5 +17,5 @@ public interface CategoriaService {
 
     Categoria actualizarCategoria(Long idCategoria, Categoria categoria) /*throws Exception*/;
 
-    void eliminarCategoria(Long idCategoria) /*throws Exception*/;
+    void eliminarCategoria(Long idCategoria);
 }
