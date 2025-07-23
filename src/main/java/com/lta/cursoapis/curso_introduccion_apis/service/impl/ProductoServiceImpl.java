@@ -1,5 +1,6 @@
 package com.lta.cursoapis.curso_introduccion_apis.service.impl;
 
+import com.lta.cursoapis.curso_introduccion_apis.dto.ProductoDTO;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
@@ -26,7 +27,7 @@ public class ProductoServiceImpl implements ProductoService {
     private CategoriaRepository categoriaRepository; //inyecto de repository categoria
 
     @Override
-    public Producto registrarProducto(Long idCategoria,Producto producto) /*throws Exception*/ {
+    public ProductoDTO registrarProducto(Long idCategoria, ProductoDTO productoDTO) /*throws Exception*/ {
         //Producto nuevoProducto = productoRepository.save(producto);
         //return nuevoProducto;
         //return productoRepository.save(producto);
@@ -36,8 +37,8 @@ public class ProductoServiceImpl implements ProductoService {
             //.orElseThrow(() -> new Exception("Categoria con ID" + idCategoria + "no encontrada"));
             .orElseThrow(() -> new ResourceNotFoundException("Categoria con ID" + idCategoria + "no encontrada"));
         //si existe la categoria que pasaron
-         producto.setCategoria(categoria);
-         return productoRepository.save(producto);
+        productoDTO.setCategoria(categoria);
+         return productoRepository.save(productoDTO);
 
     }
 

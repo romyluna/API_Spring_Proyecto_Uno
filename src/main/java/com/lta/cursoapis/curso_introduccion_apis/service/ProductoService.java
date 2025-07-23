@@ -1,5 +1,6 @@
 package com.lta.cursoapis.curso_introduccion_apis.service;
 
+import com.lta.cursoapis.curso_introduccion_apis.dto.ProductoDTO;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
 
@@ -8,21 +9,21 @@ import java.util.Optional;
 
 public interface ProductoService {
 
-    Producto registrarProducto(Long idCategoria,Producto producto) /*throws Exception*/;
+    ProductoDTO registrarProducto(Long idCategoria, ProductoDTO productoDTO) /*throws Exception*/;
 
-    List<Producto> listarProductos();
+    List<ProductoDTO> listarProductos();
 
-    Optional<Producto> buscarPorNombre(String Nombre);
+    Optional<ProductoDTO> buscarPorNombre(String Nombre);
 
-    Optional<Producto> buscarPorId(Long idProducto);
+    Optional<ProductoDTO> buscarPorId(Long idProducto);
 
-    Producto actualizarProducto(Long idProducto, Producto producto) /*throws Exception*/;
+    ProductoDTO actualizarProducto(Long idProducto, ProductoDTO productoDTO) /*throws Exception*/;
 
     void eliminarProducto(Long idProducto) /*throws Exception*/;
 
-    Producto cambiarEstadoProducto(Long idProducto, EstadoProducto estadoProducto) /*throws Exception*/;
+    ProductoDTO cambiarEstadoProducto(Long idProducto, EstadoProducto estadoProducto) /*throws Exception*/;
 
     //si quiero obtener todos los productos del estado disponible
 
-    List<Producto> obtenerProductosPorEstado(EstadoProducto estadoProducto);
+    List<ProductoDTO> obtenerProductosPorEstado(EstadoProducto estadoProducto);
 }
