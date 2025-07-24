@@ -1,5 +1,6 @@
 package com.lta.cursoapis.curso_introduccion_apis.Controller;
 
+import com.lta.cursoapis.curso_introduccion_apis.dto.CategoriaDTO;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
 import com.lta.cursoapis.curso_introduccion_apis.exceptions.ResourceNotFoundException;
@@ -22,31 +23,31 @@ public class CategoriaController {
     private CategoriaService categoriaService;
 
     @PostMapping("/crear")
-    public ResponseEntity<Categoria> crearCategoria (@RequestBody Categoria categoria) throws BadRequestException {
-            Categoria nuevaCategoria = categoriaService.crearCategoria(categoria);
+    public ResponseEntity<CategoriaDTO> crearCategoria (@RequestBody CategoriaDTO categoriaDTO) throws BadRequestException {
+        CategoriaDTO nuevaCategoria = categoriaService.crearCategoria(categoriaDTO);
             return ResponseEntity.status((HttpStatus.CREATED)).body(nuevaCategoria);
     }
 
     @GetMapping
-    public ResponseEntity<List<Categoria>> listarCategoria(){
-        List<Categoria> listaCategoria = categoriaService.listarCategoria();
-        return ResponseEntity.ok(listaCategoria);
+    public ResponseEntity<List<CategoriaDTO>> listarCategoria(){
+        List<CategoriaDTO> listaCategoriaDTO = categoriaService.listarCategoria();
+        return ResponseEntity.ok(listaCategoriaDTO);
     }
 
 
     @GetMapping("/buscar/categoria/{idCategoria}")
     public ResponseEntity<?> categoriaPorId(@PathVariable Long idCategoria){
-        Optional<Categoria> categoria = categoriaService.categoriaPorId(idCategoria);
-        return categoria.isPresent()
+        Optional<CategoriaDTO> categoriaDTO = categoriaService.categoriaPorId(idCategoria);
+        return categoriaDTO.isPresent()
                 //ternario (if-else)
-                ? ResponseEntity.ok(categoria.get()) //devuelve ok y la categoria
+                ? ResponseEntity.ok(categoriaDTO.get()) //devuelve ok y la categoria
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categoria no encontrada");
     }
 
     @PutMapping("/actualizar/{idCategoria}")
-    public ResponseEntity<?> actualizarCategoria(@PathVariable Long idCategoria,@RequestBody Categoria categoria){
+    public ResponseEntity<?> actualizarCategoria(@PathVariable Long idCategoria,@RequestBody CategoriaDTO categoriaDTO){
         try{
-            Categoria categoriaActualizada = categoriaService.actualizarCategoria(idCategoria, categoria);
+            CategoriaDTO categoriaActualizada = categoriaService.actualizarCategoria(idCategoria, categoriaDTO);
             if(categoriaActualizada != null){
                 return new ResponseEntity<>(categoriaActualizada,HttpStatus.OK);
             }else {

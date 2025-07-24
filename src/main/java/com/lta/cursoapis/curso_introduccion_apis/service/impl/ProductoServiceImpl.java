@@ -4,7 +4,9 @@ import com.lta.cursoapis.curso_introduccion_apis.dto.ProductoDTO;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
 import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
+import com.lta.cursoapis.curso_introduccion_apis.exceptions.BadRequestException;
 import com.lta.cursoapis.curso_introduccion_apis.exceptions.ResourceNotFoundException;
+import com.lta.cursoapis.curso_introduccion_apis.mapper.ProductoMapper;
 import com.lta.cursoapis.curso_introduccion_apis.repository.CategoriaRepository;
 import com.lta.cursoapis.curso_introduccion_apis.repository.ProductoRepository;
 import com.lta.cursoapis.curso_introduccion_apis.service.ProductoService;
@@ -25,75 +27,107 @@ public class ProductoServiceImpl implements ProductoService {
      private ProductoRepository productoRepository; //inyecto de repository producto
     @Autowired
     private CategoriaRepository categoriaRepository; //inyecto de repository categoria
+    @Autowired
+    private ProductoMapper productoMapper;//inyecto de mapper - categoriaMapper/productoMapper
 
     @Override
     public ProductoDTO registrarProducto(Long idCategoria, ProductoDTO productoDTO) /*throws Exception*/ {
-        //Producto nuevoProducto = productoRepository.save(producto);
-        //return nuevoProducto;
-        //return productoRepository.save(producto);
 
-        //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
+
+        //Busca la categoría por id - sino existe se lanza una excepcion "no encontrada"
         Categoria categoria = categoriaRepository.findById(idCategoria)
             //.orElseThrow(() -> new Exception("Categoria con ID" + idCategoria + "no encontrada"));
             .orElseThrow(() -> new ResourceNotFoundException("Categoria con ID" + idCategoria + "no encontrada"));
-        //si existe la categoria que pasaron
-        productoDTO.setCategoria(categoria);
-         return productoRepository.save(productoDTO);
+
+        //Valida que el precio sea mayor que cero- no se puede usar null con los double
+        if(productoDTO.getPrecio() <= 0){
+            throw new BadRequestException("El precio del producto debe ser mayor que cero");
+        }
+
+        //Convierte el DTO a entidad Producto
+        Producto producto = productoMapper.toEntity(productoDTO);
+
+        //Setea la categoría encontrada en el producto
+        producto.setCategoria(categoria);
+
+        //Guarda el producto en la base de datos
+        Producto productoGuardado = productoRepository.save(producto);
+
+        //Convierte el producto guardado a DTO y lo retorna
+        return productoMapper.toDTO(productoGuardado);
+
+
 
     }
 
     @Override
-    public List<Producto> listarProductos() {
+    public List<ProductoDTO> listarProductos() {
         //List<Producto> productos = productoRepository.findAll();
         //return productos.stream()
         //     .toList();
 
-        return productoRepository.findAll();
+        //return productoRepository.findAll();
+
+        List<Producto> productos = productoRepository.findAll();
+        //convierte cada Producto en un ProductoDTO
+        return productos.stream()
+                .map(productoMapper::toDTO)//seria como hacer esto .map(producto -> productoMapper.toDTO(producto)) para cada producto
+                .toList();
+
     }
 
     @Override
-    public Optional<Producto> buscarPorNombre(String nombre) {
+    public Optional<ProductoDTO> buscarPorNombre(String nombre) {
         //Optional<Producto> productoOptional = productoRepository.findByNombreProducto(nombre);
         //return productoOptional;
-        return productoRepository.findByNombreProducto(nombre);
+
+        //return productoRepository.findByNombreProducto(nombre);
+
+        Optional<Producto> producto = productoRepository.findByNombreProducto(nombre);
+        return producto.map(productoMapper::toDTO);
+
     }
 
     @Override
-    public Optional<Producto> buscarPorId(Long idProducto) {
+    public Optional<ProductoDTO> buscarPorId(Long idProducto) {
 
-        return productoRepository.findByIdProducto(idProducto);
+        //return productoRepository.findByIdProducto(idProducto);
+
+        Optional<Producto> producto = productoRepository.findByIdProducto(idProducto);
+        return producto.map(productoMapper::toDTO);
+
     }
 
     @Override
     // @SneakyThrows no me anda //es de lombok es como decir throw exception - no vas a colocar un try catch por eso usa este sneaky.
-    public Producto actualizarProducto(Long idProducto, Producto producto) /*throws Exception*/ {
-        //chequeo que existe el id
+    public ProductoDTO actualizarProducto(Long idProducto, ProductoDTO productoDTO) /*throws Exception*/ {
+
+        //chequeo que existe el id // es una entidad(PRODUCTO): es lo que ya estaba guardado en la base por eso no uso productoDTO sino producto
         Producto productoExistente = productoRepository.findByIdProducto(idProducto)
                 //sino existe :
-                //.orElseThrow(() -> new Exception("Producto con ID: " + idProducto + " no encontrado"));
-                .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
-        //si existe:
-        productoExistente.setNombreProducto(producto.getNombreProducto());
-        productoExistente.setDescripcion(producto.getDescripcion());
-        productoExistente.setPrecio(producto.getPrecio());
-        productoExistente.setCantidad(producto.getCantidad());
-        productoExistente.setEstadoProducto(producto.getEstadoProducto());
 
-        //Producto productoActualizado = productoRepository.save(productoExistente);
-        //return productoActualizado;
+                .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
+
+        //si existe:  copio los datos del DTO (lo que me mandó el usuario) al objeto Producto real que tengo en la base.
+        productoExistente.setNombreProducto(productoDTO.getNombreProducto());
+        productoExistente.setDescripcion(productoDTO.getDescripcion());
+        productoExistente.setPrecio(productoDTO.getPrecio());
+        productoExistente.setCantidad(productoDTO.getCantidad());
+        productoExistente.setEstadoProducto(productoDTO.getEstadoProducto());
+
 
         // verifico si el producto que me pasaron
         // ya viene con una categoría cargada, y si es así, confirma que esa categoría realmente exista en la base de datos
         //IMPORTANTE :producto.getCategoria().getIdCategoria() PORQUE Primero accedo al objeto categoria que está dentro
         // del producto, y después accedo al idCategoria que está dentro de ese objeto categoria.
-        if(producto.getCategoria() != null && producto.getCategoria().getIdCategoria() !=null){
+        if(productoDTO.getCategoria() != null && productoDTO.getCategoria().getIdCategoria() !=null){
             //voy a buscar primero que la categoria que se pase exista sino existe se lanza una excepcion "no encontrada"
-            Categoria categoria = categoriaRepository.findById(producto.getCategoria().getIdCategoria())
-                    //.orElseThrow(() -> new Exception("Categoria no encontrada"));
+            Categoria categoria = categoriaRepository.findById(productoDTO.getCategoria().getIdCategoria())
+
                     .orElseThrow(() -> new ResourceNotFoundException("Categoria no encontrada"));
             //si existe:
 
-            System.out.println("ID de la categoría recibida: " + producto.getCategoria().getIdCategoria());
+            System.out.println("ID de la categoría recibida: " + productoDTO.getCategoria().getIdCategoria());
             System.out.println("Asignando categoría: " + categoria.getNombreCategoria());
 
 
@@ -102,7 +136,12 @@ public class ProductoServiceImpl implements ProductoService {
 
         System.out.println("Producto final antes de guardar: " + productoExistente);
 
-        return productoRepository.save(productoExistente); // directamente
+        //guardando una entidad Producto en la base de datos.
+        Producto productoActualizado = productoRepository.save(productoExistente);
+        //devuelvo un dto
+        return productoMapper.toDTO(productoActualizado);
+
+
     }
 
     @Override
@@ -117,7 +156,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public Producto cambiarEstadoProducto(Long idProducto, EstadoProducto nuevoEstadoProducto) /*throws Exception*/ {
+    public ProductoDTO cambiarEstadoProducto(Long idProducto, EstadoProducto nuevoEstadoProducto) /*throws Exception*/ {
         //chequeo que existe el id
             Producto productoExistente = productoRepository.findByIdProducto(idProducto)
                     //sino existe :
@@ -125,12 +164,21 @@ public class ProductoServiceImpl implements ProductoService {
                     .orElseThrow(() -> new ResourceNotFoundException("Producto con ID: " + idProducto + " no encontrado"));
         //si existe:
         productoExistente.setEstadoProducto(nuevoEstadoProducto); // no usa get porque es de un enum ya definido.
-        //lo guarda
-        return productoRepository.save(productoExistente);
+
+        //lo guardo en la BD
+        Producto productoActualizado = productoRepository.save(productoExistente);
+
+       //Devuelvo en dto
+        return productoMapper.toDTO(productoActualizado);
     }
 
     @Override
-    public List<Producto> obtenerProductosPorEstado(EstadoProducto estadoProducto) {
-        return productoRepository.findByEstadoProducto(estadoProducto);
+    public List<ProductoDTO> obtenerProductosPorEstado(EstadoProducto estadoProducto) {
+        //obtengo los productos de la base los guardo en la lista de productos (como objeto producto)
+        List<Producto> productos = productoRepository.findByEstadoProducto(estadoProducto);
+        //recorro cada producto y los convierto en dto y los guardo en una lista
+        return productos.stream()
+                .map(productoMapper::toDTO)
+                .toList();
     }
 }

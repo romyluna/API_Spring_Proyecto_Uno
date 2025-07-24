@@ -1,21 +1,20 @@
 package com.lta.cursoapis.curso_introduccion_apis.service;
 
-import com.lta.cursoapis.curso_introduccion_apis.entity.Categoria;
-import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
-import org.apache.coyote.BadRequestException;
+import com.lta.cursoapis.curso_introduccion_apis.dto.CategoriaDTO;
+
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoriaService {
 
-    Categoria crearCategoria(Categoria categoria) /*throws BadRequestException*/;
+    CategoriaDTO crearCategoria(CategoriaDTO categoria) /*throws BadRequestException*/;
 
-    List<Categoria> listarCategoria ();
+    List<CategoriaDTO> listarCategoria ();
 
-    Optional<Categoria> categoriaPorId(Long idCategoria);
+    Optional<CategoriaDTO> categoriaPorId(Long idCategoria);
 
-    Categoria actualizarCategoria(Long idCategoria, Categoria categoria) /*throws Exception*/;
+    CategoriaDTO actualizarCategoria(Long idCategoria, CategoriaDTO categoriaDTO) /*throws Exception*/;
 
     void eliminarCategoria(Long idCategoria);
 }

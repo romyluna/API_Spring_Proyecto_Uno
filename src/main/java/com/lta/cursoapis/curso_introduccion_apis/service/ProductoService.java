@@ -2,7 +2,7 @@ package com.lta.cursoapis.curso_introduccion_apis.service;
 
 import com.lta.cursoapis.curso_introduccion_apis.dto.ProductoDTO;
 import com.lta.cursoapis.curso_introduccion_apis.entity.EstadoProducto;
-import com.lta.cursoapis.curso_introduccion_apis.entity.Producto;
+
 
 import java.util.List;
 import java.util.Optional;
